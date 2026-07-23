@@ -427,3 +427,20 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ====== Projeto Evellyn - Python / Streamlit ======
+# Credenciais do Google - NUNCA enviar ao GitHub
+credentials.json
+service_account.json
+token.json
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Logs
+*.log
