@@ -252,7 +252,15 @@ Use `st.secrets` com uma `service_account` e compartilhe a planilha com o e-mail
             mime="text/csv",
         )
 
-        resolution_data = company_averages.dropna(
+        max_chart_groups = 12
+        chart_base = company_averages.head(max_chart_groups)
+        if len(company_averages.index) > max_chart_groups:
+            st.caption(
+                f"Os graficos mostram as {max_chart_groups} empresas com maior volume de tickets. "
+                "A tabela e o CSV acima contem todas."
+            )
+
+        resolution_data = chart_base.dropna(
             subset=["Tempo medio de resolucao (dias uteis)"]
         )
         avg_res_col, avg_sla_col = st.columns(2)
@@ -262,24 +270,35 @@ Use `st.secrets` com uma `service_account` e compartilhe a planilha com o e-mail
             else:
                 resolution_figure = px.bar(
                     resolution_data,
-                    x="Empresa",
-                    y="Tempo medio de resolucao (dias uteis)",
+                    x="Tempo medio de resolucao (dias uteis)",
+                    y="Empresa",
+                    orientation="h",
                     color="Empresa",
-                    text_auto=True,
+                    text_auto=".1f",
                     title="Tempo medio de resolucao por empresa",
                 )
-                resolution_figure.update_layout(showlegend=False)
+                resolution_figure.update_layout(
+                    showlegend=False,
+                    yaxis={"categoryorder": "total ascending"},
+                    height=max(340, 40 * len(resolution_data.index) + 140),
+                )
                 st.plotly_chart(resolution_figure, use_container_width=True)
         with avg_sla_col:
             sla_figure = px.bar(
-                company_averages,
-                x="Empresa",
-                y="SLA no prazo (%)",
+                chart_base,
+                x="SLA no prazo (%)",
+                y="Empresa",
+                orientation="h",
                 color="Empresa",
-                text_auto=True,
+                text_auto=".1f",
                 title="SLA no prazo por empresa (%)",
             )
-            sla_figure.update_layout(showlegend=False, yaxis_range=[0, 100])
+            sla_figure.update_layout(
+                showlegend=False,
+                xaxis_range=[0, 100],
+                yaxis={"categoryorder": "total ascending"},
+                height=max(340, 40 * len(chart_base.index) + 140),
+            )
             st.plotly_chart(sla_figure, use_container_width=True)
 
     chart_col, source_col = st.columns([1.3, 1])

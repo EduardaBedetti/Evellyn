@@ -768,6 +768,9 @@ def average_business_days(records: pd.DataFrame) -> float | None:
     if records.empty or "business_days_to_resolution" not in records.columns:
         return None
     series = pd.to_numeric(records["business_days_to_resolution"], errors="coerce").dropna()
+    # Datas digitadas erradas geram tempos negativos ou de centenas de anos;
+    # fora do intervalo plausivel, o ticket fica fora da media.
+    series = series[(series >= 0) & (series <= 1300)]
     if series.empty:
         return None
     return round(float(series.mean()), 1)
